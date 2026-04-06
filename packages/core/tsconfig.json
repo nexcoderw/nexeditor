@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "paths": {
+      "@/core/*": ["./src/core/*"],
+      "@/extensions/*": ["./src/extensions/*"],
+      "@/ui/*": ["./src/ui/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/security/*": ["./src/security/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/utils/*": ["./src/utils/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "tests"]
+}
