@@ -1,0 +1,99 @@
+{
+  "name": "@nexcode/editor",
+  "version": "0.1.0",
+  "description": "A production-grade, secure, Google Fonts-powered RichText editor for React and Next.js",
+  "author": {
+    "name": "KAJUGA Daniels",
+    "url": "https://nexcode.africa"
+  },
+  "license": "MIT",
+  "homepage": "https://nexcode.africa",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nexcoderw/nexeditor.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/nexcoderw/nexeditor/issues"
+  },
+  "keywords": [
+    "rich-text-editor",
+    "wysiwyg",
+    "prosemirror",
+    "react",
+    "nextjs",
+    "google-fonts",
+    "editor",
+    "nexcode"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/styles/base.css",
+    "./styles/theme-light": "./dist/styles/theme-light.css",
+    "./styles/theme-dark": "./dist/styles/theme-dark.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "lint": "eslint src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "prosemirror-commands": "^1.5.2",
+    "prosemirror-dropcursor": "^1.8.1",
+    "prosemirror-gapcursor": "^1.3.2",
+    "prosemirror-history": "^1.3.2",
+    "prosemirror-inputrules": "^1.4.0",
+    "prosemirror-keymap": "^1.2.2",
+    "prosemirror-model": "^1.22.1",
+    "prosemirror-schema-list": "^1.4.1",
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-tables": "^1.5.0",
+    "prosemirror-transform": "^1.9.0",
+    "prosemirror-view": "^1.34.2",
+    "dompurify": "^3.1.5"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/dompurify": "^3.0.5",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "jsdom": "^24.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.1.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
