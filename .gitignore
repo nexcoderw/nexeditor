@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Test coverage and reports
+coverage/
+playwright-report/
+test-results/
+
+# Environment — NEVER commit secrets
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Turbo cache
+.turbo/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor artifacts
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Changeset temp files
+.changeset/*.md
+!.changeset/config.json
+!.changeset/README.md
