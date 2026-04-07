@@ -1,0 +1,219 @@
+/**
+ * components.css
+ *
+ * Global component styles that cannot live in CSS Modules.
+ *
+ * Why not CSS Modules for everything?
+ * CSS Modules generate hashed class names at build time.
+ * Some styles target DOM elements created by ProseMirror or the browser —
+ * those elements do not receive our hashed class names, so we cannot
+ * target them from CSS Modules. Those styles live here as global CSS.
+ *
+ * Also: consumers who want to override editor styles should be able
+ * to target predictable class names — not build-time hashes.
+ *
+ * All class names here use the .nex- prefix to avoid collisions
+ * with the consumer's own styles.
+ */
+
+/* ── Editor wrapper focus state ──────────────────────────────────────────────── */
+
+/*
+ * When the editor is focused, highlight the wrapper border.
+ * Uses :focus-within so it activates when any child (including the ProseMirror
+ * contenteditable) has focus.
+ */
+.nex-editor-wrapper:focus-within {
+  outline: none;
+  border-color: var(--nex-accent-color);
+  box-shadow: 0 0 0 3px var(--nex-accent-color-muted);
+  transition: border-color var(--nex-transition-fast),
+              box-shadow var(--nex-transition-fast);
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────────── */
+
+/*
+ * Global .nex-toolbar styles complement Toolbar.module.css.
+ * These target the toolbar element itself, not individual buttons.
+ */
+.nex-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--nex-z-toolbar);
+
+  /* Prevent toolbar from shrinking when the wrapper is narrow */
+  flex-shrink: 0;
+
+  /*
+   * Backdrop blur — gives the toolbar a frosted glass effect when
+   * the user scrolls content beneath it in tall editors.
+   * Graceful degradation: no backdrop-filter = solid background.
+   */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ── Bubble menu ─────────────────────────────────────────────────────────────── */
+
+.nex-bubble-menu {
+  /* Prevent the bubble menu from causing layout shifts */
+  will-change: transform, opacity;
+}
+
+/* ── Floating menu ───────────────────────────────────────────────────────────── */
+
+.nex-floating-menu {
+  will-change: transform, opacity;
+}
+
+/* ── Font picker ─────────────────────────────────────────────────────────────── */
+
+/*
+ * Scrollbar styling for the font list — makes it visually consistent
+ * with the editor's theme rather than using the OS default scrollbar.
+ */
+.nex-font-picker .nex-font-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--nex-border-color) transparent;
+}
+
+.nex-font-picker .nex-font-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nex-font-picker .nex-font-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nex-font-picker .nex-font-list::-webkit-scrollbar-thumb {
+  background-color: var(--nex-border-color);
+  border-radius: 3px;
+}
+
+/* ── Modal overlay ───────────────────────────────────────────────────────────── */
+
+/*
+ * Semi-transparent backdrop behind modals (LinkPopover, ColorPicker, TableControls).
+ * Rendered as a pseudo-element on the editor wrapper rather than a separate DOM node
+ * — this avoids z-index wars with the consumer's layout.
+ */
+.nex-editor-wrapper:has(.nex-link-popover),
+.nex-editor-wrapper:has(.nex-color-picker),
+.nex-editor-wrapper:has(.nex-table-controls) {
+  /* Pointer events on the wrapper backdrop are blocked so the user
+     cannot accidentally interact with the editor behind the modal */
+  position: relative;
+}
+
+.nex-editor-wrapper:has(.nex-link-popover)::before,
+.nex-editor-wrapper:has(.nex-color-picker)::before,
+.nex-editor-wrapper:has(.nex-table-controls)::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.25);
+  z-index: calc(var(--nex-z-modal) - 1);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* ── Table resize ────────────────────────────────────────────────────────────── */
+
+/*
+ * When the user is actively resizing a table column, show a resize cursor
+ * globally on the page so it does not flicker when the mouse moves slightly
+ * outside the resize handle.
+ */
+.nex-editor-wrapper.nex-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* ── Scrollbar styles (content area) ────────────────────────────────────────── */
+
+.nex-editor-mount {
+  scrollbar-width: thin;
+  scrollbar-color: var(--nex-border-color) transparent;
+}
+
+.nex-editor-mount::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nex-editor-mount::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nex-editor-mount::-webkit-scrollbar-thumb {
+  background-color: var(--nex-border-color);
+  border-radius: 3px;
+}
+
+.nex-editor-mount::-webkit-scrollbar-thumb:hover {
+  background-color: var(--nex-border-color-hover);
+}
+
+/* ── Print styles ────────────────────────────────────────────────────────────── */
+
+@media print {
+  /* Hide all toolbar and UI chrome when printing */
+  .nex-toolbar,
+  .nex-bubble-menu,
+  .nex-floating-menu,
+  .nex-font-picker,
+  .nex-link-popover,
+  .nex-color-picker,
+  .nex-table-controls {
+    display: none !important;
+  }
+
+  /* Remove editor border and shadow for clean print output */
+  .nex-editor-wrapper {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Ensure full-width content when printing */
+  .nex-editor-content {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────────── */
+
+/*
+ * Respect the user's reduced motion preference.
+ * Disables all transitions and animations in the editor UI.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .nex-editor-wrapper *,
+  .nex-editor-wrapper *::before,
+  .nex-editor-wrapper *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── High contrast mode ──────────────────────────────────────────────────────── */
+
+/*
+ * Windows High Contrast Mode — ensures the editor remains usable
+ * when the user has forced high contrast enabled.
+ */
+@media (forced-colors: active) {
+  .nex-editor-wrapper {
+    border: 1px solid ButtonText;
+  }
+
+  .nex-toolbar {
+    border-bottom: 1px solid ButtonText;
+  }
+
+  .nex-editor-content .ProseMirror-selectednode {
+    outline: 2px solid Highlight;
+  }
+}
