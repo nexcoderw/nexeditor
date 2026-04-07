@@ -1,0 +1,485 @@
+/**
+ * base.css
+ *
+ * Foundation styles for @nexcode/editor.
+ *
+ * What lives here:
+ * - CSS custom property declarations (the design token system)
+ * - Editor content typography (headings, paragraphs, lists, tables, code)
+ * - Placeholder styles
+ * - ProseMirror-specific structural styles (selection, gap cursor, drop cursor)
+ * - Prosemirror table styles
+ *
+ * What does NOT live here:
+ * - Colors — those are in theme-light.css and theme-dark.css
+ * - Component-specific styles — those are in *.module.css files
+ *
+ * Import order for consumers:
+ * 1. @nexcode/editor/styles         ← this file (base + light theme)
+ * 2. @nexcode/editor/styles/theme-dark  ← optional dark theme override
+ *
+ * Or import themes individually:
+ * import '@nexcode/editor/styles/theme-light';
+ * import '@nexcode/editor/styles/theme-dark';
+ */
+
+/* ── Reset ───────────────────────────────────────────────────────────────────── */
+
+/*
+ * Scoped reset — only applies inside the editor wrapper.
+ * We do NOT use a global reset to avoid interfering with the consumer's styles.
+ */
+.nex-editor-wrapper *,
+.nex-editor-wrapper *::before,
+.nex-editor-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── CSS Custom Properties (Design Tokens) ───────────────────────────────────── */
+
+/*
+ * All tokens are declared on .nex-editor-wrapper so they are scoped
+ * to the editor and do not leak into the consumer's global styles.
+ *
+ * Color tokens are NOT declared here — they live in theme-light.css
+ * and theme-dark.css so both themes can override the same property names.
+ *
+ * Tokens declared here are non-color values that are theme-independent.
+ */
+.nex-editor-wrapper {
+  /* ── Typography ─────────────────────────────────────────────────────────── */
+  --nex-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji';
+  --nex-font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo,
+    Courier, monospace;
+  --nex-font-size-base: 16px;
+  --nex-line-height-base: 1.7;
+
+  /* ── Spacing ────────────────────────────────────────────────────────────── */
+  --nex-space-1: 4px;
+  --nex-space-2: 8px;
+  --nex-space-3: 12px;
+  --nex-space-4: 16px;
+  --nex-space-5: 20px;
+  --nex-space-6: 24px;
+
+  /* ── Border Radius ──────────────────────────────────────────────────────── */
+  --nex-radius-sm: 4px;
+  --nex-radius-md: 6px;
+  --nex-radius-lg: 10px;
+  --nex-radius-xl: 16px;
+
+  /* ── Transitions ────────────────────────────────────────────────────────── */
+  --nex-transition-fast: 100ms ease;
+  --nex-transition-base: 150ms ease;
+  --nex-transition-slow: 250ms ease;
+
+  /* ── Z-index scale ──────────────────────────────────────────────────────── */
+  --nex-z-toolbar:     100;
+  --nex-z-dropdown:    200;
+  --nex-z-popover:     300;
+  --nex-z-modal:       400;
+  --nex-z-toast:       500;
+
+  /* ── Editor content spacing ─────────────────────────────────────────────── */
+  --nex-content-padding: 16px 20px;
+  --nex-content-max-width: none;
+
+  /* ── Accent color (overridable by consumer) ─────────────────────────────── */
+  /* Default accent — consumers can override this to match their brand */
+  --nex-accent-color: #4F46E5;
+  --nex-accent-color-hover: #4338CA;
+  --nex-accent-color-muted: rgba(79, 70, 229, 0.15);
+
+  /* ── Error color ────────────────────────────────────────────────────────── */
+  --nex-error-color: #DC2626;
+  --nex-error-bg: rgba(220, 38, 38, 0.06);
+}
+
+/* ── Wrapper Layout ──────────────────────────────────────────────────────────── */
+
+.nex-editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  font-family: var(--nex-font-sans);
+  font-size: var(--nex-font-size-base);
+  line-height: var(--nex-line-height-base);
+  color: var(--nex-text-primary);
+  background-color: var(--nex-editor-bg);
+  border: 1px solid var(--nex-border-color);
+  border-radius: var(--nex-radius-lg);
+  overflow: hidden;
+
+  /* Contain stacking contexts — prevents z-index bleed into consumer layout */
+  isolation: isolate;
+}
+
+/* Read-only state — visual indicator for consumers */
+.nex-editor-wrapper--readonly {
+  background-color: var(--nex-editor-readonly-bg);
+}
+
+.nex-editor-wrapper--readonly .nex-editor-content {
+  cursor: default;
+}
+
+/* ── Editor Mount Point ──────────────────────────────────────────────────────── */
+
+.nex-editor-mount {
+  flex: 1;
+  overflow-y: auto;
+  /* Smooth scrolling inside the editor */
+  scroll-behavior: smooth;
+}
+
+/* ── ProseMirror Content Area ────────────────────────────────────────────────── */
+
+/*
+ * .nex-editor-content is the class applied to the ProseMirror contenteditable div.
+ * Set in useEditor.ts via the EditorView attributes option.
+ */
+.nex-editor-content {
+  outline: none; /* Remove default browser focus ring — we handle focus styling */
+  padding: var(--nex-content-padding);
+  max-width: var(--nex-content-max-width);
+  min-height: inherit;
+
+  /* Prevent content from touching the edges on small screens */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* ── Content Typography ───────────────────────────────────────────────────────── */
+
+/* Paragraph */
+.nex-editor-content p {
+  margin: 0 0 0.75em;
+  line-height: var(--nex-line-height-base);
+}
+
+.nex-editor-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Headings — typographic scale */
+.nex-editor-content h1,
+.nex-editor-content h2,
+.nex-editor-content h3,
+.nex-editor-content h4,
+.nex-editor-content h5,
+.nex-editor-content h6 {
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--nex-heading-color);
+  margin: 1.2em 0 0.5em;
+}
+
+.nex-editor-content h1:first-child,
+.nex-editor-content h2:first-child,
+.nex-editor-content h3:first-child {
+  margin-top: 0;
+}
+
+.nex-editor-content h1 { font-size: 2em; }
+.nex-editor-content h2 { font-size: 1.5em; }
+.nex-editor-content h3 { font-size: 1.25em; }
+.nex-editor-content h4 { font-size: 1.1em; }
+.nex-editor-content h5 { font-size: 1em; }
+.nex-editor-content h6 { font-size: 0.9em; color: var(--nex-text-secondary); }
+
+/* Inline formatting */
+.nex-editor-content strong,
+.nex-editor-content b {
+  font-weight: 700;
+}
+
+.nex-editor-content em,
+.nex-editor-content i {
+  font-style: italic;
+}
+
+.nex-editor-content u {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.nex-editor-content s,
+.nex-editor-content del {
+  text-decoration: line-through;
+}
+
+.nex-editor-content mark {
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.nex-editor-content sub {
+  vertical-align: sub;
+  font-size: 0.75em;
+}
+
+.nex-editor-content sup {
+  vertical-align: super;
+  font-size: 0.75em;
+}
+
+/* Links */
+.nex-editor-content a {
+  color: var(--nex-link-color);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color var(--nex-transition-fast);
+}
+
+.nex-editor-content a:hover {
+  color: var(--nex-link-color-hover);
+}
+
+/* Inline code */
+.nex-editor-content code {
+  font-family: var(--nex-font-mono);
+  font-size: 0.875em;
+  background-color: var(--nex-code-inline-bg);
+  color: var(--nex-code-inline-color);
+  padding: 1px 5px;
+  border-radius: var(--nex-radius-sm);
+  border: 1px solid var(--nex-code-inline-border);
+}
+
+/* Code blocks */
+.nex-editor-content pre {
+  font-family: var(--nex-font-mono);
+  font-size: 0.875em;
+  background-color: var(--nex-code-block-bg);
+  color: var(--nex-code-block-color);
+  padding: var(--nex-space-4);
+  border-radius: var(--nex-radius-md);
+  border: 1px solid var(--nex-code-block-border);
+  overflow-x: auto;
+  margin: 0 0 0.75em;
+  line-height: 1.6;
+  /* Preserve all whitespace — critical for code */
+  white-space: pre;
+}
+
+/* Code inside pre — reset inherited inline code styles */
+.nex-editor-content pre code {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  color: inherit;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+}
+
+/* Blockquote */
+.nex-editor-content blockquote {
+  border-left: 3px solid var(--nex-accent-color);
+  margin: 0 0 0.75em;
+  padding: var(--nex-space-2) 0 var(--nex-space-2) var(--nex-space-4);
+  color: var(--nex-text-secondary);
+  font-style: italic;
+}
+
+.nex-editor-content blockquote p {
+  margin: 0;
+}
+
+/* Lists */
+.nex-editor-content ul,
+.nex-editor-content ol {
+  margin: 0 0 0.75em;
+  padding-left: 1.5em;
+}
+
+.nex-editor-content ul {
+  list-style-type: disc;
+}
+
+.nex-editor-content ol {
+  list-style-type: decimal;
+}
+
+.nex-editor-content li {
+  margin-bottom: 0.25em;
+  line-height: var(--nex-line-height-base);
+}
+
+/* Nested lists */
+.nex-editor-content li > ul,
+.nex-editor-content li > ol {
+  margin: 0.25em 0 0;
+}
+
+/* Horizontal rule */
+.nex-editor-content hr {
+  border: none;
+  border-top: 1px solid var(--nex-border-color);
+  margin: 1.5em 0;
+}
+
+/* Images */
+.nex-editor-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--nex-radius-sm);
+  display: block;
+  margin: 0.5em auto;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────────────────── */
+
+.nex-editor-content table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0 0 1em;
+  overflow: hidden;
+  border-radius: var(--nex-radius-md);
+  border: 1px solid var(--nex-table-border-color);
+  table-layout: fixed;
+}
+
+.nex-editor-content th,
+.nex-editor-content td {
+  position: relative;
+  padding: var(--nex-space-2) var(--nex-space-3);
+  border: 1px solid var(--nex-table-border-color);
+  vertical-align: top;
+  min-width: 60px;
+}
+
+.nex-editor-content th {
+  background-color: var(--nex-table-header-bg);
+  font-weight: 600;
+  font-size: 0.875em;
+  color: var(--nex-table-header-color);
+  text-align: left;
+}
+
+.nex-editor-content td {
+  background-color: var(--nex-table-cell-bg);
+}
+
+/* Alternating row colors */
+.nex-editor-content tr:nth-child(even) td {
+  background-color: var(--nex-table-row-alt-bg);
+}
+
+/* Selected cells — prosemirror-tables adds this class */
+.nex-editor-content .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--nex-table-cell-selected-bg);
+  pointer-events: none;
+}
+
+/* Column resize handle — prosemirror-tables */
+.nex-editor-content .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--nex-accent-color);
+  cursor: col-resize;
+  opacity: 0;
+  transition: opacity var(--nex-transition-fast);
+}
+
+.nex-editor-content th:hover .column-resize-handle,
+.nex-editor-content td:hover .column-resize-handle {
+  opacity: 1;
+}
+
+/* ── Placeholder ─────────────────────────────────────────────────────────────── */
+
+/*
+ * The placeholder is injected as a data attribute by the placeholder plugin.
+ * We render it using ::before so it is never selectable or copyable.
+ */
+.nex-editor-content .nex-placeholder::before {
+  content: attr(data-placeholder);
+  color: var(--nex-placeholder-color);
+  pointer-events: none;
+  float: left;
+  height: 0;
+  font-style: italic;
+}
+
+/* ── ProseMirror Selection ───────────────────────────────────────────────────── */
+
+/*
+ * Override the browser's default text selection color with our accent color.
+ * This creates a consistent selection appearance across all browsers.
+ */
+.nex-editor-content ::selection {
+  background-color: var(--nex-selection-bg);
+  color: var(--nex-selection-color);
+}
+
+/* ProseMirror node selection (selecting a whole block or image) */
+.nex-editor-content .ProseMirror-selectednode {
+  outline: 2px solid var(--nex-accent-color);
+  outline-offset: 2px;
+  border-radius: var(--nex-radius-sm);
+}
+
+/* ── Drop Cursor ─────────────────────────────────────────────────────────────── */
+
+/*
+ * The drag-and-drop target indicator — a vertical line showing
+ * where dragged content will be dropped.
+ */
+.nex-editor-content .ProseMirror-dropcursor {
+  border-left: 2px solid var(--nex-accent-color);
+  margin-left: -1px;
+}
+
+/* ── Gap Cursor ──────────────────────────────────────────────────────────────── */
+
+/*
+ * Gap cursor — allows placing the cursor in positions that are not
+ * normally accessible (e.g., before a table at the top of the document).
+ * Renders as a blinking cursor line.
+ */
+.nex-editor-content .ProseMirror-gapcursor {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+}
+
+.nex-editor-content .ProseMirror-gapcursor::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  border-top: 1px solid var(--nex-text-primary);
+  animation: nex-blink 1.1s steps(2, start) infinite;
+}
+
+@keyframes nex-blink {
+  to { visibility: hidden; }
+}
+
+.nex-editor-content.ProseMirror-focused .ProseMirror-gapcursor {
+  display: block;
+}
+
+/* ── Focus State ─────────────────────────────────────────────────────────────── */
+
+/*
+ * Show a focus ring on the editor wrapper when the editor is focused.
+ * This improves keyboard navigation accessibility.
+ */
+.nex-editor-wrapper:focus-within {
+  border-color: var(--nex-accent-color);
+  box-shadow: 0 0 0 3px var(--nex-accent-color-muted);
+}
