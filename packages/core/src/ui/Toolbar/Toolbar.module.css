@@ -1,0 +1,100 @@
+/**
+ * Toolbar.module.css
+ *
+ * Styles for the editor toolbar, toolbar groups, buttons, and dividers.
+ * Uses CSS custom properties defined in styles/base.css for theming.
+ * Light and dark mode handled by the theme CSS files.
+ */
+
+/* ── Toolbar wrapper ────────────────────────────────────────────────────────── */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 6px 8px;
+  background-color: var(--nex-toolbar-bg);
+  border-bottom: 1px solid var(--nex-border-color);
+  border-radius: var(--nex-radius-md) var(--nex-radius-md) 0 0;
+  user-select: none;
+}
+
+/* ── Group ──────────────────────────────────────────────────────────────────── */
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ── Divider between groups ─────────────────────────────────────────────────── */
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background-color: var(--nex-border-color);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* ── Toolbar button ─────────────────────────────────────────────────────────── */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--nex-radius-sm);
+  background-color: transparent;
+  color: var(--nex-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease;
+
+  /* Prevent text selection on rapid clicks */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.button:hover:not(.buttonDisabled) {
+  background-color: var(--nex-toolbar-button-hover-bg);
+  color: var(--nex-text-primary);
+}
+
+.button:active:not(.buttonDisabled) {
+  background-color: var(--nex-toolbar-button-active-bg);
+  transform: scale(0.96);
+}
+
+/* ── Active state (e.g., bold is ON at cursor position) ─────────────────────── */
+
+.buttonActive {
+  background-color: var(--nex-toolbar-button-pressed-bg);
+  color: var(--nex-accent-color);
+  border-color: var(--nex-accent-color-muted);
+}
+
+.buttonActive:hover {
+  background-color: var(--nex-toolbar-button-pressed-hover-bg);
+}
+
+/* ── Disabled state ─────────────────────────────────────────────────────────── */
+
+.buttonDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Focus ring — keyboard navigation ───────────────────────────────────────── */
+
+.button:focus-visible {
+  outline: 2px solid var(--nex-accent-color);
+  outline-offset: 1px;
+}
