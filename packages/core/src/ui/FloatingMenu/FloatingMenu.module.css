@@ -1,0 +1,40 @@
+/**
+ * FloatingMenu.module.css
+ */
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 5px;
+  background-color: var(--nex-bubble-menu-bg);
+  border: 1px solid var(--nex-border-color);
+  border-radius: var(--nex-radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: var(--nex-radius-sm);
+  background-color: transparent;
+  color: var(--nex-text-tertiary);
+  cursor: pointer;
+  transition: background-color 100ms ease, color 100ms ease;
+}
+
+.button:hover:not(.buttonDisabled) {
+  background-color: var(--nex-toolbar-button-hover-bg);
+  color: var(--nex-text-primary);
+}
+
+.buttonDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
