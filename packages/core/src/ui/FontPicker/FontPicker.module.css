@@ -1,0 +1,147 @@
+/**
+ * FontPicker.module.css
+ */
+
+.wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* ── Trigger ─────────────────────────────────────────────────────────────────── */
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  height: 32px;
+  border: 1px solid var(--nex-border-color);
+  border-radius: var(--nex-radius-sm);
+  background-color: transparent;
+  color: var(--nex-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.trigger:hover {
+  border-color: var(--nex-border-color-hover);
+  color: var(--nex-text-primary);
+}
+
+.triggerLabel {
+  font-size: 13px;
+}
+
+.chevron {
+  transition: transform 120ms ease;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  transition: transform 120ms ease;
+  flex-shrink: 0;
+}
+
+/* ── Dropdown ────────────────────────────────────────────────────────────────── */
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 1100;
+  width: 240px;
+  background-color: var(--nex-surface-bg);
+  border: 1px solid var(--nex-border-color);
+  border-radius: var(--nex-radius-md);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* ── Search ──────────────────────────────────────────────────────────────────── */
+
+.searchWrapper {
+  padding: 8px;
+  border-bottom: 1px solid var(--nex-border-color);
+}
+
+.searchInput {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--nex-border-color);
+  border-radius: var(--nex-radius-sm);
+  background-color: var(--nex-input-bg);
+  color: var(--nex-text-primary);
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  border-color: var(--nex-accent-color);
+}
+
+/* ── Font List ───────────────────────────────────────────────────────────────── */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 80ms ease;
+}
+
+.item:hover,
+.itemFocused {
+  background-color: var(--nex-toolbar-button-hover-bg);
+}
+
+.fontPreview {
+  flex: 1;
+  font-size: 14px;
+  color: var(--nex-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category {
+  font-size: 10px;
+  color: var(--nex-text-tertiary);
+  text-transform: capitalize;
+  flex-shrink: 0;
+}
+
+.loadingDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--nex-text-tertiary);
+  flex-shrink: 0;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.empty {
+  padding: 16px 12px;
+  font-size: 13px;
+  color: var(--nex-text-tertiary);
+  text-align: center;
+}
