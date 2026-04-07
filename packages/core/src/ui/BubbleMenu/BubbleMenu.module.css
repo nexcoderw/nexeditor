@@ -1,0 +1,54 @@
+/**
+ * BubbleMenu.module.css
+ *
+ * Floating bubble menu that appears above text selections.
+ */
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px;
+  background-color: var(--nex-bubble-menu-bg);
+  border: 1px solid var(--nex-border-color);
+  border-radius: var(--nex-radius-md);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+  /* Prevent line breaks in the menu */
+  white-space: nowrap;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--nex-radius-sm);
+  background-color: transparent;
+  color: var(--nex-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color 100ms ease,
+    color 100ms ease;
+}
+
+.button:hover:not(.buttonDisabled) {
+  background-color: var(--nex-toolbar-button-hover-bg);
+  color: var(--nex-text-primary);
+}
+
+.buttonActive {
+  color: var(--nex-accent-color);
+  background-color: var(--nex-toolbar-button-pressed-bg);
+}
+
+.buttonDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
