@@ -1,0 +1,165 @@
+/**
+ * theme-dark.css
+ *
+ * Dark theme color tokens for @nexcode/editor.
+ *
+ * Applied when:
+ * a) <NexEditor theme="dark" /> — always dark
+ * b) theme="auto" AND system prefers dark mode (prefers-color-scheme: dark)
+ *
+ * Every token mirrors the light theme token name — same properties,
+ * different values. This makes switching themes purely a CSS concern —
+ * no JavaScript, no class toggling (unless you want to).
+ *
+ * Design principles for dark theme:
+ * - Backgrounds are dark but not pure black (pure black causes eye strain)
+ * - Text is off-white, not pure white (reduces contrast fatigue)
+ * - Accent color lightened slightly for better contrast on dark surfaces
+ * - Code blocks use a slightly lighter dark than the editor background
+ *   so they are still visually distinct
+ * - Borders use semi-transparent white so they adapt to any background
+ */
+
+/* ── Always-dark: consumer sets theme="dark" ─────────────────────────────────── */
+
+.nex-editor-wrapper[data-nex-theme="dark"] {
+
+  /* ── Core surfaces ──────────────────────────────────────────────────────── */
+  --nex-editor-bg:          #1C1C1E;
+  --nex-editor-readonly-bg: #18181A;
+  --nex-surface-bg:         #2C2C2E;
+  --nex-toolbar-bg:         #252527;
+
+  /* ── Text colors ────────────────────────────────────────────────────────── */
+  --nex-text-primary:   #F5F5F7;
+  --nex-text-secondary: #A1A1AA;
+  --nex-text-tertiary:  #71717A;
+  --nex-heading-color:  #FAFAFA;
+
+  /* ── Borders ────────────────────────────────────────────────────────────── */
+  --nex-border-color:       rgba(255, 255, 255, 0.10);
+  --nex-border-color-hover: rgba(255, 255, 255, 0.18);
+
+  /* ── Toolbar interactive states ─────────────────────────────────────────── */
+  --nex-toolbar-button-hover-bg:         rgba(255, 255, 255, 0.06);
+  --nex-toolbar-button-active-bg:        rgba(255, 255, 255, 0.10);
+  --nex-toolbar-button-pressed-bg:       rgba(99, 102, 241, 0.20);
+  --nex-toolbar-button-pressed-hover-bg: rgba(99, 102, 241, 0.28);
+
+  /* ── Input fields ───────────────────────────────────────────────────────── */
+  --nex-input-bg: #1C1C1E;
+
+  /* ── Links ──────────────────────────────────────────────────────────────── */
+  --nex-link-color:       #818CF8;
+  --nex-link-color-hover: #A5B4FC;
+
+  /* ── Inline code ────────────────────────────────────────────────────────── */
+  --nex-code-inline-bg:     #2C2C2E;
+  --nex-code-inline-color:  #F87171;
+  --nex-code-inline-border: rgba(255, 255, 255, 0.08);
+
+  /* ── Code blocks ────────────────────────────────────────────────────────── */
+  --nex-code-block-bg:     #141416;
+  --nex-code-block-color:  #E2E8F0;
+  --nex-code-block-border: rgba(255, 255, 255, 0.06);
+
+  /* ── Tables ─────────────────────────────────────────────────────────────── */
+  --nex-table-border-color:      rgba(255, 255, 255, 0.10);
+  --nex-table-header-bg:         #2C2C2E;
+  --nex-table-header-color:      #D1D5DB;
+  --nex-table-cell-bg:           #1C1C1E;
+  --nex-table-row-alt-bg:        #222224;
+  --nex-table-cell-selected-bg:  rgba(99, 102, 241, 0.15);
+
+  /* ── Placeholder ────────────────────────────────────────────────────────── */
+  --nex-placeholder-color: #52525B;
+
+  /* ── Text selection ─────────────────────────────────────────────────────── */
+  --nex-selection-bg:    rgba(99, 102, 241, 0.30);
+  --nex-selection-color: #FFFFFF;
+
+  /* ── Bubble menu / dropdowns ────────────────────────────────────────────── */
+  --nex-bubble-menu-bg: #2C2C2E;
+
+  /* ── Accent color (slightly lighter for dark bg contrast) ──────────────── */
+  --nex-accent-color:       #6366F1;
+  --nex-accent-color-hover: #818CF8;
+  --nex-accent-color-muted: rgba(99, 102, 241, 0.20);
+
+  /* ── Error colors ───────────────────────────────────────────────────────── */
+  --nex-error-color: #F87171;
+  --nex-error-bg:    rgba(248, 113, 113, 0.08);
+}
+
+/* ── System-preference dark: theme="auto" + prefers-color-scheme: dark ───────── */
+
+@media (prefers-color-scheme: dark) {
+  .nex-editor-wrapper:not([data-nex-theme="light"]) {
+
+    /* ── Core surfaces ────────────────────────────────────────────────────── */
+    --nex-editor-bg:          #1C1C1E;
+    --nex-editor-readonly-bg: #18181A;
+    --nex-surface-bg:         #2C2C2E;
+    --nex-toolbar-bg:         #252527;
+
+    /* ── Text colors ──────────────────────────────────────────────────────── */
+    --nex-text-primary:   #F5F5F7;
+    --nex-text-secondary: #A1A1AA;
+    --nex-text-tertiary:  #71717A;
+    --nex-heading-color:  #FAFAFA;
+
+    /* ── Borders ──────────────────────────────────────────────────────────── */
+    --nex-border-color:       rgba(255, 255, 255, 0.10);
+    --nex-border-color-hover: rgba(255, 255, 255, 0.18);
+
+    /* ── Toolbar interactive states ───────────────────────────────────────── */
+    --nex-toolbar-button-hover-bg:         rgba(255, 255, 255, 0.06);
+    --nex-toolbar-button-active-bg:        rgba(255, 255, 255, 0.10);
+    --nex-toolbar-button-pressed-bg:       rgba(99, 102, 241, 0.20);
+    --nex-toolbar-button-pressed-hover-bg: rgba(99, 102, 241, 0.28);
+
+    /* ── Input fields ─────────────────────────────────────────────────────── */
+    --nex-input-bg: #1C1C1E;
+
+    /* ── Links ────────────────────────────────────────────────────────────── */
+    --nex-link-color:       #818CF8;
+    --nex-link-color-hover: #A5B4FC;
+
+    /* ── Inline code ──────────────────────────────────────────────────────── */
+    --nex-code-inline-bg:     #2C2C2E;
+    --nex-code-inline-color:  #F87171;
+    --nex-code-inline-border: rgba(255, 255, 255, 0.08);
+
+    /* ── Code blocks ──────────────────────────────────────────────────────── */
+    --nex-code-block-bg:     #141416;
+    --nex-code-block-color:  #E2E8F0;
+    --nex-code-block-border: rgba(255, 255, 255, 0.06);
+
+    /* ── Tables ───────────────────────────────────────────────────────────── */
+    --nex-table-border-color:      rgba(255, 255, 255, 0.10);
+    --nex-table-header-bg:         #2C2C2E;
+    --nex-table-header-color:      #D1D5DB;
+    --nex-table-cell-bg:           #1C1C1E;
+    --nex-table-row-alt-bg:        #222224;
+    --nex-table-cell-selected-bg:  rgba(99, 102, 241, 0.15);
+
+    /* ── Placeholder ──────────────────────────────────────────────────────── */
+    --nex-placeholder-color: #52525B;
+
+    /* ── Text selection ───────────────────────────────────────────────────── */
+    --nex-selection-bg:    rgba(99, 102, 241, 0.30);
+    --nex-selection-color: #FFFFFF;
+
+    /* ── Bubble menu / dropdowns ──────────────────────────────────────────── */
+    --nex-bubble-menu-bg: #2C2C2E;
+
+    /* ── Accent color ─────────────────────────────────────────────────────── */
+    --nex-accent-color:       #6366F1;
+    --nex-accent-color-hover: #818CF8;
+    --nex-accent-color-muted: rgba(99, 102, 241, 0.20);
+
+    /* ── Error colors ─────────────────────────────────────────────────────── */
+    --nex-error-color: #F87171;
+    --nex-error-bg:    rgba(248, 113, 113, 0.08);
+  }
+}
