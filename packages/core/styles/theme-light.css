@@ -1,0 +1,88 @@
+/**
+ * theme-light.css
+ *
+ * Light theme color tokens for @nexcode/editor.
+ *
+ * All color values are defined as CSS custom properties on .nex-editor-wrapper.
+ * Dark theme overrides the same property names in theme-dark.css.
+ *
+ * Naming convention:
+ *   --nex-{element}-{variant}
+ *
+ * How consumers apply themes:
+ *   // Always light:
+ *   import '@nexcode/editor/styles/theme-light';
+ *   <NexEditor theme="light" />
+ *
+ *   // Always dark:
+ *   import '@nexcode/editor/styles/theme-dark';
+ *   <NexEditor theme="dark" />
+ *
+ *   // Follow system preference (default):
+ *   import '@nexcode/editor/styles';
+ *   <NexEditor theme="auto" />
+ *   (base.css imports both themes and uses prefers-color-scheme)
+ */
+
+/* ── Light theme — applied to the wrapper directly ──────────────────────────── */
+
+.nex-editor-wrapper,
+.nex-editor-wrapper[data-nex-theme="light"] {
+
+  /* ── Core surfaces ──────────────────────────────────────────────────────── */
+  --nex-editor-bg:          #FFFFFF;
+  --nex-editor-readonly-bg: #F9FAFB;
+  --nex-surface-bg:         #FFFFFF;
+  --nex-toolbar-bg:         #F9FAFB;
+
+  /* ── Text colors ────────────────────────────────────────────────────────── */
+  --nex-text-primary:   #111827;
+  --nex-text-secondary: #4B5563;
+  --nex-text-tertiary:  #9CA3AF;
+  --nex-heading-color:  #111827;
+
+  /* ── Borders ────────────────────────────────────────────────────────────── */
+  --nex-border-color:       #E5E7EB;
+  --nex-border-color-hover: #D1D5DB;
+
+  /* ── Toolbar interactive states ─────────────────────────────────────────── */
+  --nex-toolbar-button-hover-bg:        #F3F4F6;
+  --nex-toolbar-button-active-bg:       #E5E7EB;
+  --nex-toolbar-button-pressed-bg:      #EEF2FF;
+  --nex-toolbar-button-pressed-hover-bg:#E0E7FF;
+
+  /* ── Input fields ───────────────────────────────────────────────────────── */
+  --nex-input-bg: #FFFFFF;
+
+  /* ── Links ──────────────────────────────────────────────────────────────── */
+  --nex-link-color:       #4F46E5;
+  --nex-link-color-hover: #4338CA;
+
+  /* ── Inline code ────────────────────────────────────────────────────────── */
+  --nex-code-inline-bg:     #F3F4F6;
+  --nex-code-inline-color:  #DC2626;
+  --nex-code-inline-border: #E5E7EB;
+
+  /* ── Code blocks ────────────────────────────────────────────────────────── */
+  --nex-code-block-bg:     #1F2937;
+  --nex-code-block-color:  #F9FAFB;
+  --nex-code-block-border: #374151;
+
+  /* ── Tables ─────────────────────────────────────────────────────────────── */
+  --nex-table-border-color:      #E5E7EB;
+  --nex-table-header-bg:         #F9FAFB;
+  --nex-table-header-color:      #374151;
+  --nex-table-cell-bg:           #FFFFFF;
+  --nex-table-row-alt-bg:        #FAFAFA;
+  --nex-table-cell-selected-bg:  rgba(79, 70, 229, 0.08);
+
+  /* ── Placeholder ────────────────────────────────────────────────────────── */
+  --nex-placeholder-color: #9CA3AF;
+
+  /* ── Text selection ─────────────────────────────────────────────────────── */
+  --nex-selection-bg:    rgba(79, 70, 229, 0.18);
+  --nex-selection-color: inherit;
+
+  /* ── Bubble menu / dropdowns ────────────────────────────────────────────── */
+  --nex-bubble-menu-bg: #FFFFFF;
+}
