@@ -88,6 +88,35 @@ export default {
 };
 ```
 
+## Google Fonts catalog
+
+The built-in font picker now uses the full bundled Google Fonts catalog by default.
+
+```tsx
+import {
+  NexEditor,
+  FontFamily,
+  DEFAULT_FONTS,
+  GOOGLE_FONTS_CATALOG,
+} from '@nexcode/editor';
+
+export default function MyEditor() {
+  return (
+    <NexEditor
+      extensions={[FontFamily]}
+      fontPicker={{
+        fonts: GOOGLE_FONTS_CATALOG, // default behavior
+        searchable: true,
+        visibleCount: 12,
+        preview: true,
+      }}
+    />
+  );
+}
+```
+
+Use `DEFAULT_FONTS` if you want the smaller curated subset instead of the full catalog.
+
 ## Security
 
 All HTML entering the editor is sanitized via DOMPurify with a strict allowlist.
