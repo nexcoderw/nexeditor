@@ -23,12 +23,25 @@ export default defineConfig({
     ],
 
     resolve: {
-        alias: {
-            // Point @nexcode/editor to the local source during development.
-            // This means changes to the editor source are immediately reflected
-            // in the playground without a build step.
-            '@nexcode/editor': resolve(__dirname, '../../packages/core/src/index.ts'),
-        },
+        alias: [
+            // Match the package entry exactly so CSS subpath imports keep working.
+            {
+                find: /^@nexcode\/editor$/,
+                replacement: resolve(__dirname, '../../packages/core/src/index.ts'),
+            },
+            {
+                find: /^@nexcode\/editor\/styles$/,
+                replacement: resolve(__dirname, '../../packages/core/styles/index.css'),
+            },
+            {
+                find: /^@nexcode\/editor\/styles\/theme-light$/,
+                replacement: resolve(__dirname, '../../packages/core/styles/theme-light.css'),
+            },
+            {
+                find: /^@nexcode\/editor\/styles\/theme-dark$/,
+                replacement: resolve(__dirname, '../../packages/core/styles/theme-dark.css'),
+            },
+        ],
     },
 
     server: {
