@@ -47,6 +47,7 @@ import {
     TextColor,
     Highlight,
     FontFamily,
+    FontSize,
 
     // Types
     type NexEditorInstance,
@@ -69,6 +70,7 @@ const EXTENSIONS = [
     Highlight,
     Link,
     FontFamily,
+    FontSize,
 
     // Block nodes
     Paragraph,
@@ -98,7 +100,8 @@ const INITIAL_CONTENT = `
 <h2>Features</h2>
 <ul>
   <li><strong>Security first</strong> — all HTML is sanitized via DOMPurify</li>
-  <li><strong>Google Fonts</strong> — 18 curated fonts loaded via FontFace API</li>
+  <li><strong>Google Fonts</strong> — full bundled catalog with lazy-loaded previews</li>
+  <li><strong>Font size control</strong> — adjust text size with the toolbar stepper</li>
   <li><strong>Fully accessible</strong> — ARIA labels, keyboard navigation, focus management</li>
   <li><strong>Theme aware</strong> — light, dark, and auto (system preference) modes</li>
   <li><strong>Next.js ready</strong> — SSR safe, "use client" boundary handled for you</li>
@@ -599,4 +602,3 @@ const styles: Record<string, React.CSSProperties> = {
         textDecoration: 'none',
     },
 };
-
