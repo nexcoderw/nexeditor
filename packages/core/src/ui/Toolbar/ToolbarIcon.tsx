@@ -23,7 +23,7 @@ type IconName =
     | 'heading' | 'paragraph'
     | 'list-bullet' | 'list-ordered'
     | 'link' | 'image' | 'table'
-    | 'code-block' | 'text-color' | 'highlight' | 'font-family'
+    | 'code-block' | 'text-color' | 'highlight' | 'font-family' | 'font-size'
     | 'align-left' | 'align-center' | 'align-right' | 'align-justify'
     | 'undo' | 'redo' | 'clear-formatting';
 
@@ -172,6 +172,15 @@ const ICONS: Record<IconName, JSX.Element> = {
             <path d="M4 20V7l8-3 8 3v13" />
             <path d="M12 4v16" />
             <line x1="4" y1="20" x2="20" y2="20" />
+        </>
+    ),
+
+    'font-size': (
+        <>
+            <path d="M6 18l4-12 4 12" />
+            <line x1="7.5" y1="14" x2="12.5" y2="14" />
+            <line x1="16" y1="8" x2="22" y2="8" />
+            <line x1="19" y1="5" x2="19" y2="11" />
         </>
     ),
 
