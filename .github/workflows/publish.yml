@@ -1,0 +1,295 @@
+# publish.yml
+#
+# npm publish pipeline for @nexcode/editor.
+#
+# Triggers:
+# - Manually via workflow_dispatch (recommended for first publish)
+# - Automatically when a changeset version PR is merged to main
+#
+# Flow:
+# 1. Changesets creates a "Version Packages" PR automatically
+#    when changeset files are merged to main
+# 2. When that PR is merged, this workflow runs
+# 3. It builds the package and publishes to npm with provenance
+#
+# Security:
+# - Uses npm provenance attestation (npm >= 9.5)
+#   This creates a cryptographic link between the package
+#   and the GitHub Actions run that produced it.
+#   Consumers can verify the package came from this repo.
+# - The NPM_TOKEN secret must be set in repository settings
+# - Node version is pinned — not floating
+# - npm ci is used — never npm install — for reproducible installs
+
+name: Publish to npm
+
+on:
+  # Manual trigger — use this for the very first publish
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — build and pack without publishing'
+        type: boolean
+        default: false
+
+  # Automatic trigger when changesets version PR is merged
+  push:
+    branches:
+      - main
+    paths:
+      # Only run when package versions change
+      - 'packages/core/package.json'
+      - 'packages/*/CHANGELOG.md'
+
+# Only one publish can run at a time
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+
+  # ── Job: Verify before publish ─────────────────────────────────────────────
+
+  verify:
+    name: Pre-publish verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    outputs:
+      # Pass the package version to the publish job
+      version: ${{ steps.pkg.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          # Point to npm registry — required for provenance
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Read package version
+        id: pkg
+        run: |
+          VERSION=$(node -p "require('./packages/core/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION"
+
+      - name: Run full CI suite before publishing
+        run: |
+          echo "Running lint..."
+          npm run lint --workspace=packages/core
+
+          echo "Running type check..."
+          npm run typecheck --workspace=packages/core
+
+          echo "Running unit tests..."
+          npm run test --workspace=packages/core
+
+      - name: Build package
+        run: npm run build --workspace=packages/core
+        env:
+          NODE_ENV: production
+
+      - name: Verify build integrity
+        run: |
+          echo "Verifying build outputs..."
+
+          # Verify all expected files are present
+          REQUIRED_FILES=(
+            "packages/core/dist/index.js"
+            "packages/core/dist/index.cjs"
+            "packages/core/dist/index.d.ts"
+            "packages/core/dist/styles/base.css"
+            "packages/core/dist/styles/theme-light.css"
+            "packages/core/dist/styles/theme-dark.css"
+            "packages/core/dist/styles/components.css"
+          )
+
+          MISSING=0
+          for FILE in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$FILE" ]; then
+              echo "MISSING: $FILE"
+              MISSING=1
+            else
+              echo "OK: $FILE"
+            fi
+          done
+
+          if [ $MISSING -eq 1 ]; then
+            echo "Build verification FAILED — missing files"
+            exit 1
+          fi
+
+          echo "Build integrity verified."
+
+      - name: Check package contents
+        working-directory: packages/core
+        run: |
+          echo "=== Files that will be published ==="
+          npm pack --dry-run 2>&1
+
+      - name: Verify package author
+        run: |
+          # Enforce the author field is correct before publishing.
+          # This prevents accidentally publishing with wrong author metadata.
+          AUTHOR=$(node -p "require('./packages/core/package.json').author.name")
+          EXPECTED="KAJUGA Daniels"
+
+          if [ "$AUTHOR" != "$EXPECTED" ]; then
+            echo "ERROR: Package author mismatch."
+            echo "Expected: $EXPECTED"
+            echo "Got: $AUTHOR"
+            exit 1
+          fi
+
+          echo "Author verified: $AUTHOR"
+
+      - name: Verify package homepage
+        run: |
+          HOMEPAGE=$(node -p "require('./packages/core/package.json').homepage")
+          EXPECTED="https://nexcode.africa"
+
+          if [ "$HOMEPAGE" != "$EXPECTED" ]; then
+            echo "ERROR: Package homepage mismatch."
+            echo "Expected: $EXPECTED"
+            echo "Got: $HOMEPAGE"
+            exit 1
+          fi
+
+          echo "Homepage verified: $HOMEPAGE"
+
+      # Upload build for publish job to use — avoids rebuilding
+      - name: Upload verified build
+        uses: actions/upload-artifact@v4
+        with:
+          name: verified-build
+          path: packages/core/dist/
+          retention-days: 1
+
+  # ── Job: Publish ───────────────────────────────────────────────────────────
+
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: verify
+
+    # Required for npm provenance attestation
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download verified build
+        uses: actions/download-artifact@v4
+        with:
+          name: verified-build
+          path: packages/core/dist/
+
+      - name: Dry run — pack without publishing
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        working-directory: packages/core
+        run: |
+          echo "DRY RUN — not publishing to npm"
+          npm pack
+          echo "Pack completed. Tarball:"
+          ls -lh *.tgz
+
+      - name: Publish to npm with provenance
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        working-directory: packages/core
+        run: |
+          echo "Publishing @nexcode/editor v${{ needs.verify.outputs.version }}..."
+
+          npm publish \
+            --access public \
+            --provenance \
+            --tag latest
+
+          echo "Published successfully."
+        env:
+          # NPM_TOKEN must be set as a repository secret in GitHub settings.
+          # Generate at: https://www.npmjs.com/settings/your-username/tokens
+          # Use a Granular Access Token scoped to @nexcode/editor only.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub release
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ needs.verify.outputs.version }}';
+            const tagName = `v${version}`;
+
+            // Read CHANGELOG for this version to use as release notes
+            const { readFileSync } = require('fs');
+            let releaseNotes = '';
+
+            try {
+              const changelog = readFileSync(
+                'packages/core/CHANGELOG.md',
+                'utf8',
+              );
+              // Extract the section for this version
+              const versionHeader = `## ${version}`;
+              const start = changelog.indexOf(versionHeader);
+              if (start !== -1) {
+                const end = changelog.indexOf('\n## ', start + 1);
+                releaseNotes = end !== -1
+                  ? changelog.slice(start, end).trim()
+                  : changelog.slice(start).trim();
+              }
+            } catch {
+              releaseNotes = `Release @nexcode/editor v${version}`;
+            }
+
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tagName,
+              name: `@nexcode/editor v${version}`,
+              body: releaseNotes,
+              draft: false,
+              prerelease: version.includes('-'),
+            });
+
+            console.log(`Created GitHub release: ${tagName}`);
+
+      - name: Publish summary
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          echo "## Published @nexcode/editor" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ needs.verify.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Author:** KAJUGA Daniels" >> $GITHUB_STEP_SUMMARY
+          echo "**Homepage:** https://nexcode.africa" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Install with:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "npm install @nexcode/editor" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "npm page: https://www.npmjs.com/package/@nexcode/editor" >> $GITHUB_STEP_SUMMARY
