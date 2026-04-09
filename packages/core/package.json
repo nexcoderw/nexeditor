@@ -51,6 +51,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "update:fonts": "node scripts/update-google-fonts-catalog.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
