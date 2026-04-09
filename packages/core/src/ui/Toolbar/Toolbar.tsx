@@ -76,24 +76,24 @@ export function Toolbar({ extensions, className = '' }: ToolbarProps): JSX.Eleme
     }, [extensions]);
 
     // Group items by their group field
-    const groupedItems = useMemo
-    Map < ToolbarItemDescriptor['group'], ToolbarItemDescriptor[] >
-  > (() => {
-            const groups = new Map
+    const groupedItems = useMemo<
+        Map<ToolbarItemDescriptor['group'], ToolbarItemDescriptor[]>
+    >(() => {
+        const groups = new Map<
             ToolbarItemDescriptor['group'],
-                ToolbarItemDescriptor[]
-                > ();
+            ToolbarItemDescriptor[]
+        >();
 
-            for (const item of toolbarItems) {
-                const group = item.group;
-                if (!groups.has(group)) {
-                    groups.set(group, []);
-                }
-                groups.get(group)!.push(item);
+        for (const item of toolbarItems) {
+            const group = item.group;
+            if (!groups.has(group)) {
+                groups.set(group, []);
             }
+            groups.get(group)!.push(item);
+        }
 
-            return groups;
-        }, [toolbarItems]);
+        return groups;
+    }, [toolbarItems]);
 
     // Don't render the toolbar if the editor isn't ready
     if (!editor || !editorState) return null;
