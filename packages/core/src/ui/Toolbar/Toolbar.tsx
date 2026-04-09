@@ -27,6 +27,7 @@ import { useMemo } from 'react';
 import { useNexEditorContext } from '../EditorContext';
 import { useEditorState } from '../../hooks/useEditorState';
 import { ToolbarButton } from './ToolbarButton';
+import { FontPicker } from '../FontPicker/FontPicker';
 import type { NexExtension } from '../../types/extension.types';
 import type { ToolbarItemDescriptor } from '../../types/extension.types';
 import styles from './Toolbar.module.css';
@@ -128,6 +129,10 @@ export function Toolbar({ extensions, className = '' }: ToolbarProps): JSX.Eleme
                         {items.map((item) => {
                             const isActive = editorState ? item.isActive(editorState) : false;
                             const isEnabled = editorState ? item.isEnabled(editorState) : false;
+
+                            if (item.id === 'font_family') {
+                                return <FontPicker key={item.id} />;
+                            }
 
                             return (
                                 <ToolbarButton
