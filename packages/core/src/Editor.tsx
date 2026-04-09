@@ -43,6 +43,7 @@ import { EditorProvider } from './ui/EditorContext';
 import { Toolbar } from './ui/Toolbar/Toolbar';
 import type { NexEditorOptions } from './types/editor.types';
 import type { EditorTheme } from './types/editor.types';
+import type { FontPickerConfig } from './types/font.types';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -86,6 +87,12 @@ export interface NexEditorProps extends NexEditorOptions {
     maxHeight?: string;
 
     /**
+     * Configuration for the built-in font picker in the default toolbar.
+     * Use this to swap between the full Google Fonts catalog and a smaller curated subset.
+     */
+    fontPicker?: FontPickerConfig;
+
+    /**
      * Child components rendered inside the editor provider.
      * Use this to add custom UI components (toolbars, floating menus, etc.)
      * that need access to the editor context.
@@ -108,6 +115,7 @@ export function NexEditor({
     showToolbar = true,
     minHeight = '200px',
     maxHeight,
+    fontPicker,
     children,
     ...editorOptions
 }: NexEditorProps): JSX.Element {
@@ -134,7 +142,10 @@ export function NexEditor({
             >
                 {/* Built-in toolbar — hidden in readOnly mode */}
                 {showToolbar && !editorOptions.readOnly && (
-                    <Toolbar extensions={editorOptions.extensions ?? []} />
+                    <Toolbar
+                        extensions={editorOptions.extensions ?? []}
+                        {...(fontPicker ? { fontPicker } : {})}
+                    />
                 )}
 
                 {/* The ProseMirror editor mount point */}
