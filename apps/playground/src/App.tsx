@@ -314,19 +314,19 @@ export default function App(): JSX.Element {
             <footer style={styles.footer}>
                 <span>
                     <strong>@nexcode/editor</strong> — built by{' '}
-
-                    href="https://nexcode.africa"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={styles.footerLink}
-          >
+                    <a
+                        href="https://nexcode.africa"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={styles.footerLink}
+                    >
                     KAJUGA Daniels / NexCode Africa
-                </a>
-            </span>
-            <span style={styles.footerDivider}>·</span>
-            <span>Powered by ProseMirror + React + Google Fonts</span>
-        </footer>
-    </div >
+                    </a>
+                </span>
+                <span style={styles.footerDivider}>·</span>
+                <span>Powered by ProseMirror + React + Google Fonts</span>
+            </footer>
+        </div>
   );
 }
 
