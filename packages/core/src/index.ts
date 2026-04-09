@@ -121,6 +121,13 @@ export { FontPicker } from './ui/FontPicker/FontPicker';
 export type { FontPickerProps } from './ui/FontPicker/FontPicker';
 
 /**
+ * FontSizeControl — Docs-style decrease/input/increase size control.
+ * Rendered in the built-in toolbar when the FontSize extension is registered.
+ */
+export { FontSizeControl } from './ui/FontSizeControl/FontSizeControl';
+export type { FontSizeControlProps } from './ui/FontSizeControl/FontSizeControl';
+
+/**
  * LinkPopover — dialog for inserting and editing hyperlinks.
  * Renders inside <NexEditor /> automatically when the Link extension is registered.
  */
@@ -248,6 +255,21 @@ export {
  */
 export { FontFamily, DEFAULT_FONTS, GOOGLE_FONTS_CATALOG } from './extensions/font';
 export { loadFont, applyFont, removeFont, isFontLoaded } from './extensions/font';
+
+/**
+ * Font size extension — applies font-size marks and powers the built-in size control.
+ */
+export { FontSize } from './extensions/font-size';
+export {
+    applyFontSize,
+    removeFontSize,
+    changeFontSize,
+    getCurrentFontSize,
+    getCurrentFontSizePx,
+    DEFAULT_FONT_SIZE_PX,
+    MIN_FONT_SIZE_PX,
+    MAX_FONT_SIZE_PX,
+} from './extensions/font-size';
 
 // ─── Core Utilities ───────────────────────────────────────────────────────────
 
