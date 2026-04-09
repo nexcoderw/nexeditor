@@ -127,10 +127,9 @@ export interface FontLoadResult {
  */
 export interface FontPickerConfig {
     /**
-     * The curated list of fonts to offer in the picker.
-     * If omitted, the built-in default list of 20 popular Google Fonts is used.
-     *
-     * Keep this list short — each distinct font family requires a network request.
+     * The list of fonts to offer in the picker.
+     * If omitted, the built-in full Google Fonts catalog is used.
+     * Pass `DEFAULT_FONTS` if you want the smaller curated subset instead.
      */
     fonts?: NexFont[];
 

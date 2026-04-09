@@ -13,7 +13,7 @@
  * Security:
  * - All font names are validated before loading or applying
  * - The font loader only contacts the Google Fonts CDN
- * - No user-supplied URLs — fonts come from the curated DEFAULT_FONTS list
+ * - No user-supplied URLs — fonts come from the bundled Google Fonts catalog
  */
 
 'use client';
@@ -23,21 +23,30 @@ import {
     useRef,
     useEffect,
     useCallback,
+    useMemo,
     type KeyboardEvent,
+    type CSSProperties,
 } from 'react';
 import { useNexEditorContext } from '../EditorContext';
 import { useFontLoader } from '../../hooks/useFontLoader';
-import { applyFont, DEFAULT_FONTS } from '../../extensions/font';
-import type { NexFont } from '../../types/font.types';
+import { applyFont } from '../../extensions/font';
+import type { NexFont, FontPickerConfig } from '../../types/font.types';
 import styles from './FontPicker.module.css';
+
+let defaultCatalogPromise: Promise<NexFont[]> | null = null;
+
+async function loadDefaultCatalog(): Promise<NexFont[]> {
+    if (!defaultCatalogPromise) {
+        defaultCatalogPromise = import('../../data/google-fonts-catalog')
+            .then((module) => module.GOOGLE_FONTS_CATALOG);
+    }
+
+    return defaultCatalogPromise;
+}
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
-export interface FontPickerProps {
-    /** Override the default font list with a custom curated set */
-    fonts?: NexFont[];
-    /** Whether to show a search input */
-    searchable?: boolean;
+export interface FontPickerProps extends FontPickerConfig {
     /** Additional CSS class */
     className?: string;
 }
@@ -45,8 +54,10 @@ export interface FontPickerProps {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function FontPicker({
-    fonts = DEFAULT_FONTS,
+    fonts,
     searchable = true,
+    visibleCount = 10,
+    preview = true,
     className = '',
 }: FontPickerProps): JSX.Element | null {
     const editor = useNexEditorContext();
@@ -55,28 +66,71 @@ export function FontPicker({
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [focusedIndex, setFocusedIndex] = useState(0);
+    const [loadedCatalog, setLoadedCatalog] = useState<NexFont[] | null>(
+        fonts ?? null,
+    );
+    const [isCatalogLoading, setIsCatalogLoading] = useState(false);
 
     const triggerRef = useRef<HTMLButtonElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
+    useEffect(() => {
+        setLoadedCatalog(fonts ?? null);
+        setIsCatalogLoading(false);
+    }, [fonts]);
+
+    const availableFonts = fonts ?? loadedCatalog ?? [];
+
     // Filter fonts by search query
-    const filteredFonts = fonts.filter((font) =>
-        font.family.toLowerCase().includes(search.toLowerCase()),
-    );
+    const filteredFonts = useMemo(() => (
+        availableFonts.filter((font) =>
+            font.family.toLowerCase().includes(search.toLowerCase()),
+        )
+    ), [availableFonts, search]);
+
+    const listStyle = useMemo<CSSProperties | undefined>(() => {
+        if (!Number.isFinite(visibleCount) || visibleCount <= 0) {
+            return undefined;
+        }
+
+        return { maxHeight: `${visibleCount * 40}px` };
+    }, [visibleCount]);
 
     // Open/close the dropdown
-    const toggleOpen = useCallback(() => {
-        setIsOpen((prev) => !prev);
+    const ensureCatalogLoaded = useCallback(async () => {
+        if (fonts || loadedCatalog || isCatalogLoading) return;
+
+        setIsCatalogLoading(true);
+        try {
+            const catalog = await loadDefaultCatalog();
+            setLoadedCatalog(catalog);
+        } finally {
+            setIsCatalogLoading(false);
+        }
+    }, [fonts, loadedCatalog, isCatalogLoading]);
+
+    const open = useCallback(() => {
+        setIsOpen(true);
         setSearch('');
         setFocusedIndex(0);
-    }, []);
+        void ensureCatalogLoaded();
+    }, [ensureCatalogLoaded]);
 
     const close = useCallback(() => {
         setIsOpen(false);
         setSearch('');
         triggerRef.current?.focus();
     }, []);
+
+    const toggleOpen = useCallback(() => {
+        if (isOpen) {
+            close();
+            return;
+        }
+
+        open();
+    }, [close, isOpen, open]);
 
     // Close on outside click
     useEffect(() => {
@@ -106,11 +160,12 @@ export function FontPicker({
     // Preload font for preview on hover
     const handleFontHover = useCallback(
         async (font: NexFont) => {
+            if (!preview) return;
             if (!isFontLoaded(font.family)) {
                 await loadFontFamily(font);
             }
         },
-        [isFontLoaded, loadFontFamily],
+        [isFontLoaded, loadFontFamily, preview],
     );
 
     // Apply a font to the editor selection
@@ -211,8 +266,11 @@ export function FontPicker({
                         role="listbox"
                         aria-label="Available fonts"
                         className={styles.list}
+                        style={listStyle}
                     >
-                        {filteredFonts.length === 0 ? (
+                        {isCatalogLoading && availableFonts.length === 0 ? (
+                            <li className={styles.empty}>Loading Google Fonts...</li>
+                        ) : filteredFonts.length === 0 ? (
                             <li className={styles.empty}>No fonts found</li>
                         ) : (
                             filteredFonts.map((font, index) => {
@@ -236,7 +294,7 @@ export function FontPicker({
                                         <span
                                             className={styles.fontPreview}
                                             style={
-                                                loaded
+                                                preview && loaded
                                                     ? { fontFamily: `'${font.family}', sans-serif` }
                                                     : undefined
                                             }
