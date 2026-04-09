@@ -30,12 +30,14 @@ import {
     useEffect,
     useRef,
     useState,
-    useCallback,
     type RefObject,
 } from 'react';
 import { EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import { DOMParser as ProseMirrorDOMParser } from 'prosemirror-model';
+import {
+    DOMParser as ProseMirrorDOMParser,
+    DOMSerializer,
+} from 'prosemirror-model';
 import { dropCursor } from 'prosemirror-dropcursor';
 import { gapCursor } from 'prosemirror-gapcursor';
 import { inputRules } from 'prosemirror-inputrules';
@@ -311,7 +313,6 @@ export function useEditor(options: NexEditorOptions = {}): UseEditorReturn {
                 const fragment = view.state.doc.content;
 
                 // Use a temporary DOMSerializer to convert the document
-                const { DOMSerializer } = require('prosemirror-model') as typeof import('prosemirror-model');
                 const serializer = DOMSerializer.fromSchema(schema);
                 const domFragment = serializer.serializeFragment(fragment);
                 div.appendChild(domFragment);
