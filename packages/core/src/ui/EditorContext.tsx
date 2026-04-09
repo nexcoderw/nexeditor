@@ -6,6 +6,7 @@
  * Why context instead of prop drilling?
  * The editor instance needs to be accessible by:
  * - Toolbar (reads state, dispatches commands)
+ * - FontSizeControl (reads/writes font-size marks)
  * - BubbleMenu (reads selection, dispatches commands)
  * - FloatingMenu (reads state)
  * - FontPicker (dispatches font marks)
