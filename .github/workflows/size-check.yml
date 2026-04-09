@@ -1,0 +1,128 @@
+# size-check.yml
+#
+# Bundle size tracking.
+#
+# Runs on every PR to main and reports whether the change
+# increases or decreases the published package size.
+#
+# This keeps the package lean — bundle size creep is real.
+# A PR that doubles the bundle size for a minor feature
+# should trigger a conversation before it merges.
+
+name: Bundle Size Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+
+  size:
+    name: Bundle Size Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build PR branch
+        run: npm run build --workspace=packages/core
+        env:
+          NODE_ENV: production
+
+      - name: Measure PR bundle sizes
+        id: pr-sizes
+        run: |
+          ESM=$(wc -c < packages/core/dist/index.js)
+          CJS=$(wc -c < packages/core/dist/index.cjs)
+          DTS=$(wc -c < packages/core/dist/index.d.ts)
+
+          # Sum all CSS files
+          CSS=0
+          for f in packages/core/dist/styles/*.css; do
+            SIZE=$(wc -c < "$f")
+            CSS=$((CSS + SIZE))
+          done
+
+          echo "esm=$ESM" >> $GITHUB_OUTPUT
+          echo "cjs=$CJS" >> $GITHUB_OUTPUT
+          echo "dts=$DTS" >> $GITHUB_OUTPUT
+          echo "css=$CSS" >> $GITHUB_OUTPUT
+
+          echo "=== Bundle sizes (bytes) ==="
+          echo "ESM: $ESM"
+          echo "CJS: $CJS"
+          echo "DTS: $DTS"
+          echo "CSS: $CSS"
+
+      - name: Post size report to PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const esmSize = ${{ steps.pr-sizes.outputs.esm }};
+            const cjsSize = ${{ steps.pr-sizes.outputs.cjs }};
+            const dtsSize = ${{ steps.pr-sizes.outputs.dts }};
+            const cssSize = ${{ steps.pr-sizes.outputs.css }};
+
+            const formatBytes = (bytes) => {
+              if (bytes < 1024) return `${bytes} B`;
+              if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+              return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+            };
+
+            const body = [
+              '## Bundle Size Report',
+              '',
+              '| Output | Size |',
+              '|--------|------|',
+              `| ESM (\`dist/index.js\`) | ${formatBytes(esmSize)} |`,
+              `| CJS (\`dist/index.cjs\`) | ${formatBytes(cjsSize)} |`,
+              `| TypeScript types (\`dist/index.d.ts\`) | ${formatBytes(dtsSize)} |`,
+              `| CSS (all themes) | ${formatBytes(cssSize)} |`,
+              '',
+              '_Note: These are uncompressed sizes. Gzip typically reduces JS by ~70%._',
+            ].join('\n');
+
+            // Find existing size comment and update it, or create a new one
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existingComment = comments.data.find(
+              c => c.body.includes('Bundle Size Report')
+            );
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
