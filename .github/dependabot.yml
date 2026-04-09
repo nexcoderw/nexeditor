@@ -1,0 +1,82 @@
+# dependabot.yml
+#
+# Dependabot configuration — automated dependency updates.
+#
+# Dependabot opens PRs to update dependencies when new versions are available.
+# It runs weekly to keep dependencies current without overwhelming maintainers.
+#
+# Two ecosystems:
+# 1. npm — JavaScript/TypeScript dependencies
+# 2. github-actions — CI/CD workflow action versions
+#
+# Security policy:
+# - Dependabot PRs go through the full CI pipeline before merge
+# - Security updates are prioritized (they create PRs immediately)
+# - PRs are limited to 5 open at a time to avoid review queue overflow
+
+version: 2
+
+updates:
+
+  # ── npm dependencies ───────────────────────────────────────────────────────
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      # Run every Monday — aligns with weekly security audit
+      interval: weekly
+      day: monday
+      time: '08:00'
+      timezone: 'Africa/Kigali'
+
+    # Max open PRs at once — prevents overwhelming the maintainer
+    open-pull-requests-limit: 5
+
+    # Group all non-security updates into a single PR per week
+    groups:
+      development-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      production-dependencies:
+        dependency-type: production
+        update-types:
+          - patch
+
+    # Labels applied to Dependabot PRs for easy filtering
+    labels:
+      - dependencies
+      - automated
+
+    # Commit message format — matches our conventional commits style
+    commit-message:
+      prefix: 'chore'
+      prefix-development: 'chore'
+      include: scope
+
+    # Ignore major version bumps — review those manually
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
+  # ── GitHub Actions versions ────────────────────────────────────────────────
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '08:00'
+      timezone: 'Africa/Kigali'
+
+    open-pull-requests-limit: 3
+
+    labels:
+      - dependencies
+      - ci
+      - automated
+
+    commit-message:
+      prefix: 'ci'
+      include: scope
