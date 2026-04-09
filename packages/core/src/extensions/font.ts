@@ -37,6 +37,8 @@ import type {
     FontWeight,
 } from '../types/font.types';
 
+export { GOOGLE_FONTS_CATALOG } from '../data/google-fonts-catalog';
+
 // ─── Default Font List ────────────────────────────────────────────────────────
 
 /**
