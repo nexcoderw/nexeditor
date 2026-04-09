@@ -28,8 +28,10 @@ import { useNexEditorContext } from '../EditorContext';
 import { useEditorState } from '../../hooks/useEditorState';
 import { ToolbarButton } from './ToolbarButton';
 import { FontPicker } from '../FontPicker/FontPicker';
+import { FontSizeControl } from '../FontSizeControl/FontSizeControl';
 import type { NexExtension } from '../../types/extension.types';
 import type { ToolbarItemDescriptor } from '../../types/extension.types';
+import type { FontPickerConfig } from '../../types/font.types';
 import styles from './Toolbar.module.css';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -40,6 +42,9 @@ export interface ToolbarProps {
 
     /** Additional CSS class for the toolbar wrapper */
     className?: string;
+
+    /** Configuration for the built-in font picker control */
+    fontPicker?: FontPickerConfig;
 }
 
 // ─── Toolbar Groups ───────────────────────────────────────────────────────────
@@ -55,7 +60,11 @@ const GROUP_ORDER: ToolbarItemDescriptor['group'][] = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function Toolbar({ extensions, className = '' }: ToolbarProps): JSX.Element | null {
+export function Toolbar({
+    extensions,
+    className = '',
+    fontPicker,
+}: ToolbarProps): JSX.Element | null {
     const editor = useNexEditorContext();
     const editorState = useEditorState(editor);
 
@@ -130,8 +139,22 @@ export function Toolbar({ extensions, className = '' }: ToolbarProps): JSX.Eleme
                             const isActive = editorState ? item.isActive(editorState) : false;
                             const isEnabled = editorState ? item.isEnabled(editorState) : false;
 
+                            if (item.id === 'font_size') {
+                                return (
+                                    <FontSizeControl
+                                        key={item.id}
+                                        editorState={editorState}
+                                    />
+                                );
+                            }
+
                             if (item.id === 'font_family') {
-                                return <FontPicker key={item.id} />;
+                                return (
+                                    <FontPicker
+                                        key={item.id}
+                                        {...(fontPicker ?? {})}
+                                    />
+                                );
                             }
 
                             return (
