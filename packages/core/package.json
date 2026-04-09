@@ -35,7 +35,7 @@
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
     },
-    "./styles": "./dist/styles/base.css",
+    "./styles": "./dist/styles/index.css",
     "./styles/theme-light": "./dist/styles/theme-light.css",
     "./styles/theme-dark": "./dist/styles/theme-dark.css"
   },
