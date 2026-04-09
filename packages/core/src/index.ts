@@ -114,7 +114,7 @@ export type { FloatingMenuProps } from './ui/FloatingMenu/FloatingMenu';
 
 /**
  * FontPicker — Google Fonts selector dropdown.
- * Renders in the toolbar automatically when the Font extension is registered.
+ * Uses the full bundled Google Fonts catalog by default.
  * Export this if you want to embed it in a custom toolbar.
  */
 export { FontPicker } from './ui/FontPicker/FontPicker';
@@ -246,7 +246,7 @@ export {
  * @example
  * extensions={[FontFamily]}
  */
-export { FontFamily, DEFAULT_FONTS } from './extensions/font';
+export { FontFamily, DEFAULT_FONTS, GOOGLE_FONTS_CATALOG } from './extensions/font';
 export { loadFont, applyFont, removeFont, isFontLoaded } from './extensions/font';
 
 // ─── Core Utilities ───────────────────────────────────────────────────────────
