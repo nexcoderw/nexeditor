@@ -1,0 +1,21 @@
+/**
+ * index.css
+ *
+ * The main CSS entry point for @nexcode/editor.
+ *
+ * Import this in your application to get all editor styles:
+ *   import '@nexcode/editor/styles';
+ *
+ * This file imports:
+ * 1. base.css       — design tokens + content typography
+ * 2. theme-light.css — light theme colors (default)
+ * 3. theme-dark.css  — dark theme + system preference detection
+ * 4. components.css  — global component styles
+ *
+ * Import order is intentional — do not reorder.
+ */
+
+@import './base.css';
+@import './theme-light.css';
+@import './theme-dark.css';
+@import './components.css';
