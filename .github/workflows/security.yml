@@ -1,0 +1,147 @@
+# security.yml
+#
+# Scheduled security audit pipeline.
+#
+# Runs:
+# - Every Monday at 09:00 UTC (weekly audit)
+# - On every push to main (catches new vulnerabilities immediately)
+# - Manually via workflow_dispatch
+#
+# Checks:
+# 1. npm audit — known CVEs in dependencies
+# 2. Dependency review — flags new vulnerable deps in PRs
+# 3. CodeQL — static analysis for security issues in source code
+
+name: Security Audit
+
+on:
+  schedule:
+    # Every Monday at 09:00 UTC
+    - cron: '0 9 * * 1'
+
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+
+  # ── Job: npm audit ─────────────────────────────────────────────────────────
+
+  npm-audit:
+    name: npm Dependency Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        # Fail on high and critical severity vulnerabilities.
+        # Moderate and low are reported but do not fail the build.
+        run: npm audit --audit-level=high
+
+      - name: Check for outdated packages
+        # Report outdated packages — informational, does not fail
+        run: npm outdated || true
+
+  # ── Job: CodeQL static analysis ────────────────────────────────────────────
+
+  codeql:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      # Required for CodeQL to read the repository
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          # Analyze both JavaScript and TypeScript
+          languages: javascript-typescript
+
+          # Use the security-extended query suite —
+          # more thorough than the default suite
+          queries: security-extended
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for analysis
+        run: npm run build --workspace=packages/core
+        env:
+          NODE_ENV: production
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          # Upload results to the Security tab in GitHub
+          category: '/language:javascript-typescript'
+
+  # ── Job: Dependency review (PRs only) ──────────────────────────────────────
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # Only runs on pull requests — reviews what new deps are being added
+    if: github.event_name == 'pull_request'
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          # Fail if new deps have high or critical CVEs
+          fail-on-severity: high
+
+          # Comment on the PR with a summary of new dependencies
+          comment-summary-in-pr: always
+
+          # Allow packages with these licenses only
+          allow-licenses: >-
+            MIT,
+            Apache-2.0,
+            BSD-2-Clause,
+            BSD-3-Clause,
+            ISC,
+            0BSD
